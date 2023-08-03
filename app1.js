@@ -95,8 +95,8 @@ function App1() {
       //comedor
       case "statusAutoComedor":
         !statusAutoComedor
-          ? (sendDataComedor = "autoon")
-          : (sendDataComedor = "autooff");
+          ? (sendDataComedor = "autoonpircomedor")
+          : (sendDataComedor = "autoofpircomedor");
         setStatusAutoComedor(!statusAutoComedor);
 
         break;
