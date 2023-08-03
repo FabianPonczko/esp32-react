@@ -5,9 +5,8 @@ import App1 from './app1.js'
 export default function App() {
   return (
     <View style={styles.container}>
-      <StatusBar style="auto" />
-    <App1 />
-
+      {/* <StatusBar style="auto" /> */}
+      <App1 />
     </View>
   );
 }
