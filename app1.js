@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Alert, Button } from "react-native";
+import { Alert, Button, TextInput } from "react-native";
 import {
   StyleSheet,
   Text,
@@ -11,7 +11,7 @@ import {
   StatusBar,
 } from "react-native";
 import Checkbox from "expo-checkbox";
-import { setStatusBarTranslucent } from "expo-status-bar";
+
 
 const cosinaIp = "http://192.168.100.147:1000";
 const comedorIp = "http://192.168.100.200:1002";
@@ -20,7 +20,10 @@ function App1() {
   const [inicioCocina, setInicioCocina] = useState(cosinaIp);
   const [inicioComedor, setInicioComedor] = useState(comedorIp);
   const [statusAutoCocina, setStatusAutoCocina] = useState(false);
+  const [intervaloCocina, setIntervaloCocina] = useState("");
   const [statusAutoComedor, setStatusAutoComedor] = useState(false);
+  const [intervaloComedor, setIntervaloComedor] = useState("");
+
   const [onRefresh, setOnRefresh] = useState(false);
 
   const loadData = async () => {
@@ -33,13 +36,15 @@ function App1() {
         .then((resp) => {
           if (resp.includes("Checkbox")) {
             setStatusAutoCocina(true);
+            setIntervaloCocina(resp.substring(22,19))
+            console.log("intervaloCocina",intervaloCocina)
           } else {
             setStatusAutoCocina(false);
+            setIntervaloCocina(resp.substring(12,9))
+            console.log(intervaloCocina)
           }
         })
-        .finally
-        // setOnRefresh(false)
-        ();
+        
     } catch (error) {
       console.log(error);
     }
@@ -53,17 +58,21 @@ function App1() {
         .then((resp) => {
           if (resp.includes("Checkbox")) {
             setStatusAutoComedor(true);
+            setIntervaloComedor(resp.substring(22,19))
+            console.log("intervaloComedor",intervaloComedor)
+            
           } else {
             setStatusAutoComedor();
+            setIntervaloComedor(resp.substring(12,9))
+            console.log(intervaloComedor)
           }
         })
-        .finally(setOnRefresh(false));
-    } catch (error) {
-      console.log(error);
-    }
-    console.log("**************************************inicio programa");
-    console.log("status cocina", statusAutoCocina);
-    console.log("status comedor", statusAutoComedor);
+      } catch (error) {
+        console.log(error);
+      }finally{setOnRefresh(false)}
+    // console.log("**************************************");
+    // console.log("status cocina", statusAutoCocina);
+    // console.log("status comedor", statusAutoComedor);
   };
 
   useEffect(() => {
@@ -135,8 +144,39 @@ function App1() {
     }
   };
 
+  const handleIntervalCocina = async (interval)=>{
+       //status cocina
+       const valor = interval * 1000
+        
+       try {
+        await fetch(`${cosinaIp}/grabatiempo=${valor}`)
+          .then((res) => {
+            Alert.alert("tiempo actualizado")
+            return res.text()
+          })
+                   
+      } catch (error) {
+        console.log(error);
+      }
+  }
+  const handleIntervalComedor = async (interval)=>{
+    //status cocina
+    const valor =interval * 1000
+     
+    try {
+     await fetch(`${comedorIp}/grabatiempo=${valor}`)
+       .then((res) => {
+         Alert.alert("tiempo actualizado")
+         return res.text()
+       })
+                
+   } catch (error) {
+     console.log(error);
+   }
+}
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar />
       <ScrollView
         contentContainerStyle={styles.scrollView}
         refreshControl={
@@ -144,33 +184,53 @@ function App1() {
         }
       >
         <View>
-          <View style={styles.section}>
-            <Checkbox
-              style={{ height: 45, width: 45, margin: 10 }}
-              disabled={false}
-              value={statusAutoCocina}
-              onValueChange={() => handleLigth("statusAutoCocina")}
-            />
-            <TouchableOpacity onPress={()=>handleLigth("statusAutoCocina")}>
-              <Text style={{ fontSize: 25, margin: 15 }}>Automatico Cocina</Text>
+          <View style={styles.contenedor}>
+            <View style={styles.section}>
+              <Checkbox
+                style={{ height: 45, width: 45, margin: 10 }}
+                disabled={false}
+                value={statusAutoCocina}
+                onValueChange={() => handleLigth("statusAutoCocina")}
+                />
+              <TouchableOpacity onPress={()=>handleLigth("statusAutoCocina")}>
+                <Text style={{ fontSize: 20, margin: 15 ,color:"#5D6D7E"}}>Automatico Cocina</Text>
+              </TouchableOpacity>
+              <TextInput style={styles.input} 
+                placeholder="000" 
+                keyboardType="phone-pad" 
+                value={intervaloCocina}
+                onChangeText={(value) => setIntervaloCocina(value)}
+                onSubmitEditing={(value) => handleIntervalCocina(value.nativeEvent.text)}
+                />
+            </View>
+            <TouchableOpacity onPress={() => handleLigth("encender")}>
+              <Text style={[styles.boton, { backgroundColor: "#757575" }]}>
+                Encender
+              </Text>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={() => handleLigth("encender")}>
-            <Text style={[styles.boton, { backgroundColor: "#757575" }]}>
-              Encender
-            </Text>
-          </TouchableOpacity>
+          
+          <View style={styles.contenedor}>
 
+          
           <View style={styles.section}>
             <Checkbox
               style={{ height: 45, width: 45, margin: 10 }}
               disabled={false}
               value={statusAutoComedor}
               onValueChange={() => handleLigth("statusAutoComedor")}
-            />
+              />
             <TouchableOpacity  onPress={() =>handleLigth("statusAutoComedor")}>
-              <Text style={{ fontSize: 25, margin: 15 }}>Automatico Comedor</Text>
+              <Text style={{ fontSize: 20, margin: 15 ,color:"#5D6D7E"}}>Automatico Comedor</Text>
             </TouchableOpacity>
+            <TextInput style={styles.input} 
+               placeholder="000" 
+               keyboardType="phone-pad" 
+               value={intervaloComedor}
+               onChangeText={(value) => setIntervaloComedor(value)}
+               onSubmitEditing={(value) => handleIntervalComedor(value.nativeEvent.text)}
+            />
+
           </View>
           <TouchableOpacity onPress={() => handleLigth("encender1")}>
             <Text style={[styles.boton, { backgroundColor: "#757575" }]}>
@@ -182,7 +242,9 @@ function App1() {
               Encender
             </Text>
           </TouchableOpacity>
+          </View>
         </View>
+          
       </ScrollView>
     </SafeAreaView>
   );
@@ -192,8 +254,8 @@ const styles = StyleSheet.create({
   container: {
     width:"100%",
     flex: 1,
-    paddingTop: StatusBar.currentHeight + 30,
-    backgroundColor:"#e5e4e2"
+    paddingTop: StatusBar.currentHeight ,
+    backgroundColor:"#e5e4e2",
   },
   boton: {
     textAlign: "center",
@@ -207,8 +269,24 @@ const styles = StyleSheet.create({
   section: {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent:"flex-start",
+    alignItems:"center",
+  },
+  contenedor:{
+    // backgroundColor:"#bebebe",
+    display:"flex",
+    justifyContent:"center",
+    borderColor:"#dcdcdc",
+    borderWidth:1,
+    margin:5
+  },
+  input: {
+    borderColor: "#707B7C",
+    color:"#707B7C",
+    width: "14%",
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 10,
   },
 });
 
