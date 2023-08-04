@@ -23,6 +23,7 @@ function App1() {
   const [intervaloCocina, setIntervaloCocina] = useState("");
   const [statusAutoComedor, setStatusAutoComedor] = useState(false);
   const [intervaloComedor, setIntervaloComedor] = useState("");
+  const [controlDeLuz, setControlDeLuz] = useState("");
 
   const [onRefresh, setOnRefresh] = useState(false);
 
@@ -37,11 +38,12 @@ function App1() {
           if (resp.includes("Checkbox")) {
             setStatusAutoCocina(true);
             setIntervaloCocina(resp.substring(22,19))
-            console.log("intervaloCocina",intervaloCocina)
+            let positionInicial= resp.search("controldeluz")
+            let positionFinal= resp.search("entrada")
+            setControlDeLuz(resp.substring(positionFinal,positionInicial+12))
           } else {
             setStatusAutoCocina(false);
             setIntervaloCocina(resp.substring(12,9))
-            console.log(intervaloCocina)
           }
         })
         
@@ -59,12 +61,10 @@ function App1() {
           if (resp.includes("Checkbox")) {
             setStatusAutoComedor(true);
             setIntervaloComedor(resp.substring(22,19))
-            console.log("intervaloComedor",intervaloComedor)
             
           } else {
             setStatusAutoComedor();
             setIntervaloComedor(resp.substring(12,9))
-            console.log(intervaloComedor)
           }
         })
       } catch (error) {
@@ -174,9 +174,21 @@ function App1() {
      console.log(error);
    }
 }
+const handleControlDeLuz = async (value)=>{
+  try {
+   await fetch(`${cosinaIp}/controldeluz${value}`)
+     .then((res) => {
+       Alert.alert("actualizado")
+       return res.text()
+     })
+              
+ } catch (error) {
+   console.log(error);
+ }
+}
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar />
+      <StatusBar  barStyle='light-content' />
       <ScrollView
         contentContainerStyle={styles.scrollView}
         refreshControl={
@@ -187,13 +199,13 @@ function App1() {
           <View style={styles.contenedor}>
             <View style={styles.section}>
               <Checkbox
-                style={{ height: 45, width: 45, margin: 10 }}
+                style={{ height: 25, width: 25, margin: 10 }}
                 disabled={false}
                 value={statusAutoCocina}
                 onValueChange={() => handleLigth("statusAutoCocina")}
                 />
               <TouchableOpacity onPress={()=>handleLigth("statusAutoCocina")}>
-                <Text style={{ fontSize: 20, margin: 15 ,color:"#5D6D7E"}}>Automatico Cocina</Text>
+                <Text style={{ fontSize: 15, margin: 10 ,color:"#5D6D7E"}}>Automatico Cocina</Text>
               </TouchableOpacity>
               <TextInput style={styles.input} 
                 placeholder="000" 
@@ -211,17 +223,16 @@ function App1() {
           </View>
           
           <View style={styles.contenedor}>
-
           
           <View style={styles.section}>
             <Checkbox
-              style={{ height: 45, width: 45, margin: 10 }}
+              style={{ height: 25, width: 25, margin: 10 }}
               disabled={false}
               value={statusAutoComedor}
               onValueChange={() => handleLigth("statusAutoComedor")}
               />
             <TouchableOpacity  onPress={() =>handleLigth("statusAutoComedor")}>
-              <Text style={{ fontSize: 20, margin: 15 ,color:"#5D6D7E"}}>Automatico Comedor</Text>
+              <Text style={{ fontSize: 15, margin: 10 ,color:"#5D6D7E"}}>Automatico Comedor</Text>
             </TouchableOpacity>
             <TextInput style={styles.input} 
                placeholder="000" 
@@ -242,6 +253,17 @@ function App1() {
               Encender
             </Text>
           </TouchableOpacity>
+          
+          </View>
+          <View style={styles.section}>
+            <Text style={{ fontSize: 15, margin: 10 ,color:"#5D6D7E"}}>Sensor de luz</Text>
+            <TextInput style={styles.input} 
+                placeholder="000" 
+                keyboardType="phone-pad" 
+                value={controlDeLuz}
+                onChangeText={(value) => setControlDeLuz(value)}
+                onSubmitEditing={(value) => handleControlDeLuz(value.nativeEvent.text)}             
+                />
           </View>
         </View>
           
@@ -260,11 +282,11 @@ const styles = StyleSheet.create({
   boton: {
     textAlign: "center",
     color: "white",
-    borderRadius: 50,
-    padding: 20,
-    paddingHorizontal: 40,
-    fontSize: 30,
-    margin: 10,
+    borderRadius: 5,
+    padding: 10,
+    paddingHorizontal: 20,
+    fontSize: 20,
+    margin: 5,
   },
   section: {
     display: "flex",
@@ -286,7 +308,7 @@ const styles = StyleSheet.create({
     width: "14%",
     borderWidth: 1,
     borderRadius: 10,
-    padding: 10,
+    paddingHorizontal:15,
   },
 });
 
