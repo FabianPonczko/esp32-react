@@ -45,7 +45,7 @@ function App1() {
             let positionFinalComedor= resp.search("Cgrabatiemp")          
             setAutoComedor(resp.substring(positionFinalComedor,positionInicialComedor+17))
             console.log(resp)
-            
+            console.log("autocomedor",autoComedor)
 
             let inicioIntervaloComedor= resp.search("Cgrabatiemp=")
             let finalIntervaloComedor= resp.search(" hora")
@@ -227,7 +227,7 @@ const handleControlDeLuz = async (value)=>{
                 onValueChange={() => handleLigth("autoCocinaOn")}
                 />
               <TouchableOpacity onPress={()=>handleLigth("autoCocinaOn")}>
-                <Text style={{ fontSize: 15, margin: 10 ,color:"#5D6D7E"}}>Automatico Cocina</Text>
+                <Text style={{ fontSize: 15, margin: 5 ,color:"#5D6D7E"}}>Automatico Cocina</Text>
               </TouchableOpacity>
               <Text>Temporizador</Text>
               <TextInput style={styles.input} 
@@ -255,7 +255,7 @@ const handleControlDeLuz = async (value)=>{
               onValueChange={() => handleLigth("autoComedorOn")}
               />
             <TouchableOpacity  onPress={() =>handleLigth("autoComedorOn")}>
-              <Text style={{ fontSize: 15, margin: 10 ,color:"#5D6D7E"}}>Automatico Comedor</Text>
+              <Text style={{ fontSize: 15, margin: 5 ,color:"#5D6D7E"}}>Automatico Comedor</Text>
             </TouchableOpacity>
             <Text>Temporizador</Text>
             <TextInput style={styles.input} 
@@ -327,14 +327,14 @@ const styles = StyleSheet.create({
     margin:5
   },
   input: {
-    borderColor: "#dcdcdc",
+    borderColor: "#AEB6BF",
     color:"#707B7C",
-    width: "14%",
+    width: "12%",
     borderWidth: 1,
     borderRadius: 10,
-    paddingHorizontal:15,
+    paddingHorizontal:10,
     padding:5,
-    marginLeft:10
+    marginLeft:5
   },
 });
 
