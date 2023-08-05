@@ -9,6 +9,7 @@ import {
   RefreshControl,
   SafeAreaView,
   StatusBar,
+  Vibration
 } from "react-native";
 import Checkbox from "expo-checkbox";
 
@@ -19,9 +20,9 @@ const comedorIp = "http://192.168.100.200:1002";
 function App1() {
   const [inicioCocina, setInicioCocina] = useState(cosinaIp);
   const [inicioComedor, setInicioComedor] = useState(comedorIp);
-  const [statusAutoCocina, setStatusAutoCocina] = useState(false);
+  const [autoCocina, setAutoCocina] = useState(false);
   const [intervaloCocina, setIntervaloCocina] = useState("");
-  const [statusAutoComedor, setStatusAutoComedor] = useState(false);
+  const [autoComedor, setAutoComedor] = useState(false);
   const [intervaloComedor, setIntervaloComedor] = useState("");
   const [controlDeLuz, setControlDeLuz] = useState("");
 
@@ -36,14 +37,34 @@ function App1() {
         })
         .then((resp) => {
           if (resp.includes("Checkbox")) {
-            setStatusAutoCocina(true);
+            console.log(resp)
+            setAutoCocina(true);
             setIntervaloCocina(resp.substring(22,19))
+
+            let positionInicialComedor= resp.search("automaticocomedor")
+            let positionFinalComedor= resp.search("Cgrabatiemp")          
+            setAutoComedor(resp.substring(positionFinalComedor,positionInicialComedor+17))
+            console.log(resp)
+            
+
+            let inicioIntervaloComedor= resp.search("Cgrabatiemp=")
+            let finalIntervaloComedor= resp.search(" hora")
+            console.log(inicioIntervaloComedor)
+            console.log(finalIntervaloComedor)
+            setIntervaloComedor((resp.substring(finalIntervaloComedor,inicioIntervaloComedor+12)))
+            console.log(intervaloComedor)
+
             let positionInicial= resp.search("controldeluz")
             let positionFinal= resp.search("entrada")
             setControlDeLuz(resp.substring(positionFinal,positionInicial+12))
+
+
           } else {
-            setStatusAutoCocina(false);
+            setAutoCocina(false);
             setIntervaloCocina(resp.substring(12,9))
+            let positionInicial= resp.search("controldeluz")
+            let positionFinal= resp.search("entrada")
+            setControlDeLuz(resp.substring(positionFinal,positionInicial+12))
           }
         })
         
@@ -59,20 +80,20 @@ function App1() {
         })
         .then((resp) => {
           if (resp.includes("Checkbox")) {
-            setStatusAutoComedor(true);
-            setIntervaloComedor(resp.substring(22,19))
+            // setAutoComedor(true);
+            // setIntervaloComedor(resp.substring(22,19))
             
           } else {
-            setStatusAutoComedor();
-            setIntervaloComedor(resp.substring(12,9))
+            // setAutoComedor();
+            // setIntervaloComedor(resp.substring(12,9))
           }
         })
       } catch (error) {
         console.log(error);
       }finally{setOnRefresh(false)}
     // console.log("**************************************");
-    // console.log("status cocina", statusAutoCocina);
-    // console.log("status comedor", statusAutoComedor);
+    // console.log("status cocina", autoCocina);
+    // console.log("status comedor", autoComedor);
   };
 
   useEffect(() => {
@@ -81,6 +102,7 @@ function App1() {
   }, []);
 
   const handleLigth = (data) => {
+    Vibration.vibrate()
     console.log("data: ", data);
 
     let sendDataCocina = "";
@@ -89,11 +111,11 @@ function App1() {
     //client.println(s + "Lucesinicio"  + luzcomedor1 + luzcomedor2 + luz1prendida + luz2prendida );
     switch (data) {
       //cocina
-      case "statusAutoCocina":
-        !statusAutoCocina
+      case "autoCocinaOn":
+        !autoCocina
           ? (sendDataCocina = "autoon")
           : (sendDataCocina = "autooff");
-        setStatusAutoCocina(!statusAutoCocina);
+        setAutoCocina(!autoCocina);
 
         break;
 
@@ -102,11 +124,11 @@ function App1() {
         break;
 
       //comedor
-      case "statusAutoComedor":
-        !statusAutoComedor
-          ? (sendDataComedor = "autoonpircomedor")
-          : (sendDataComedor = "autoofpircomedor");
-        setStatusAutoComedor(!statusAutoComedor);
+      case "autoComedorOn":
+        !autoComedor
+          ? (sendDataCocina = "autoonpircomedor")
+          : (sendDataCocina = "autoofpircomedor");
+        setAutoComedor(!autoComedor);
 
         break;
       case "encender1":
@@ -164,7 +186,7 @@ function App1() {
     const valor =interval * 1000
      
     try {
-     await fetch(`${comedorIp}/grabatiempo=${valor}`)
+     await fetch(`${cosinaIp}/Cgrabatiemp=${valor}`)
        .then((res) => {
          Alert.alert("tiempo actualizado")
          return res.text()
@@ -201,12 +223,13 @@ const handleControlDeLuz = async (value)=>{
               <Checkbox
                 style={{ height: 25, width: 25, margin: 10 }}
                 disabled={false}
-                value={statusAutoCocina}
-                onValueChange={() => handleLigth("statusAutoCocina")}
+                value={autoCocina}
+                onValueChange={() => handleLigth("autoCocinaOn")}
                 />
-              <TouchableOpacity onPress={()=>handleLigth("statusAutoCocina")}>
+              <TouchableOpacity onPress={()=>handleLigth("autoCocinaOn")}>
                 <Text style={{ fontSize: 15, margin: 10 ,color:"#5D6D7E"}}>Automatico Cocina</Text>
               </TouchableOpacity>
+              <Text>Temporizador</Text>
               <TextInput style={styles.input} 
                 placeholder="000" 
                 keyboardType="phone-pad" 
@@ -228,18 +251,19 @@ const handleControlDeLuz = async (value)=>{
             <Checkbox
               style={{ height: 25, width: 25, margin: 10 }}
               disabled={false}
-              value={statusAutoComedor}
-              onValueChange={() => handleLigth("statusAutoComedor")}
+              value={autoComedor}
+              onValueChange={() => handleLigth("autoComedorOn")}
               />
-            <TouchableOpacity  onPress={() =>handleLigth("statusAutoComedor")}>
+            <TouchableOpacity  onPress={() =>handleLigth("autoComedorOn")}>
               <Text style={{ fontSize: 15, margin: 10 ,color:"#5D6D7E"}}>Automatico Comedor</Text>
             </TouchableOpacity>
+            <Text>Temporizador</Text>
             <TextInput style={styles.input} 
-               placeholder="000" 
-               keyboardType="phone-pad" 
-               value={intervaloComedor}
-               onChangeText={(value) => setIntervaloComedor(value)}
-               onSubmitEditing={(value) => handleIntervalComedor(value.nativeEvent.text)}
+              placeholder="000" 
+              keyboardType="phone-pad" 
+              value={intervaloComedor}
+              onChangeText={(value) => setIntervaloComedor(value)}
+              onSubmitEditing={(value) => handleIntervalComedor(value.nativeEvent.text)}
             />
 
           </View>
@@ -303,12 +327,14 @@ const styles = StyleSheet.create({
     margin:5
   },
   input: {
-    borderColor: "#707B7C",
+    borderColor: "#dcdcdc",
     color:"#707B7C",
     width: "14%",
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal:15,
+    padding:5,
+    marginLeft:10
   },
 });
 
