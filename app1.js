@@ -37,23 +37,15 @@ function App1() {
         })
         .then((resp) => {
           if (resp.includes("Checkbox")) {
-            console.log(resp)
             setAutoCocina(true);
             setIntervaloCocina(resp.substring(22,19))
-
             let positionInicialComedor= resp.search("automaticocomedor")
             let positionFinalComedor= resp.search("Cgrabatiemp")          
-            setAutoComedor(resp.substring(positionFinalComedor,positionInicialComedor+17))
-            console.log(resp)
-            console.log("autocomedor",autoComedor)
-
+            const automaticoComedor = resp.substring(positionFinalComedor,positionInicialComedor+17) === "1"? true:false
+            setAutoComedor(automaticoComedor)
             let inicioIntervaloComedor= resp.search("Cgrabatiemp=")
             let finalIntervaloComedor= resp.search(" hora")
-            console.log(inicioIntervaloComedor)
-            console.log(finalIntervaloComedor)
             setIntervaloComedor((resp.substring(finalIntervaloComedor,inicioIntervaloComedor+12)))
-            console.log(intervaloComedor)
-
             let positionInicial= resp.search("controldeluz")
             let positionFinal= resp.search("entrada")
             setControlDeLuz(resp.substring(positionFinal,positionInicial+12))
@@ -210,7 +202,7 @@ const handleControlDeLuz = async (value)=>{
 }
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar  barStyle='light-content' />
+      <StatusBar  barStyle='default' />
       <ScrollView
         contentContainerStyle={styles.scrollView}
         refreshControl={
