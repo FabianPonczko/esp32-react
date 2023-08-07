@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Alert, Button, TextInput } from "react-native";
 import {
   StyleSheet,
@@ -9,9 +9,11 @@ import {
   RefreshControl,
   SafeAreaView,
   StatusBar,
-  Vibration
+  Vibration,
+  Animated
 } from "react-native";
 import Checkbox from "expo-checkbox";
+import { MaterialIcons,Entypo ,MaterialCommunityIcons,AntDesign,FontAwesome    } from '@expo/vector-icons';
 
 
 const cosinaIp = "http://192.168.100.147:1000";
@@ -29,6 +31,7 @@ function App1() {
   const [onRefresh, setOnRefresh] = useState(false);
 
   const loadData = async () => {
+    
     //status cocina
     try {
       await fetch(`${cosinaIp}/inicio`)
@@ -87,11 +90,31 @@ function App1() {
     // console.log("status cocina", autoCocina);
     // console.log("status comedor", autoComedor);
   };
+  
+  const fadeIn = useRef(new Animated.Value(0)).current
 
   useEffect(() => {
     setOnRefresh(true);
     loadData();
-  }, []);
+      setTimeout(()=>{
+        Animated.loop(
+          Animated.sequence([
+            Animated.timing(fadeIn,
+              {
+                toValue:1,
+                duration:1000,
+                useNativeDriver: true,
+              }),
+              Animated.timing(fadeIn,
+                {
+                  toValue:0,
+                  duration:1000,
+                  useNativeDriver: true,
+                })
+              ]),
+            ).start()
+            },10000)
+          }, []);
 
   const handleLigth = (data) => {
     Vibration.vibrate()
@@ -203,25 +226,38 @@ const handleControlDeLuz = async (value)=>{
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar  barStyle='default' />
+      <View style={styles.title}>
+        <AntDesign name="home" size={24} color="black" />
+        <Text style={{marginHorizontal:10}}>Asistente luces del Hogar</Text>
+      </View>
       <ScrollView
         contentContainerStyle={styles.scrollView}
         refreshControl={
-          <RefreshControl refreshing={onRefresh} onRefresh={loadData} />
-        }
+          <RefreshControl refreshing={onRefresh} onRefresh={loadData} />}
       >
         <View>
           <View style={styles.contenedor}>
             <View style={styles.section}>
-              <Checkbox
+              {/* <Checkbox
                 style={{ height: 25, width: 25, margin: 10 }}
                 disabled={false}
                 value={autoCocina}
                 onValueChange={() => handleLigth("autoCocinaOn")}
-                />
+                /> */}
+              <TouchableOpacity onPress={()=>handleLigth("autoCocinaOn")}>
+
+              {autoCocina
+              ?
+              <MaterialCommunityIcons name="toggle-switch" size={50} color="black" style={{marginHorizontal:10}}/>
+              :
+              <MaterialCommunityIcons name="toggle-switch-off-outline" size={50} color="black" style={{marginHorizontal:10}}/>
+            }
+            </TouchableOpacity>
               <TouchableOpacity onPress={()=>handleLigth("autoCocinaOn")}>
                 <Text style={{ fontSize: 15, margin: 5 ,color:"#5D6D7E"}}>Automatico Cocina</Text>
               </TouchableOpacity>
-              <Text>Temporizador</Text>
+              {/* <Text>Temporizador</Text> */}
+              <MaterialIcons name="timer" size={24} color="black" style={{marginHorizontal:10}}/>
               <TextInput style={styles.input} 
                 placeholder="000" 
                 keyboardType="phone-pad" 
@@ -231,7 +267,7 @@ const handleControlDeLuz = async (value)=>{
                 />
             </View>
             <TouchableOpacity onPress={() => handleLigth("encender")}>
-              <Text style={[styles.boton, { backgroundColor: "#757575" }]}>
+              <Text style={[styles.boton, { backgroundColor: "#757575"}]}>
                 Encender
               </Text>
             </TouchableOpacity>
@@ -240,16 +276,25 @@ const handleControlDeLuz = async (value)=>{
           <View style={styles.contenedor}>
           
           <View style={styles.section}>
-            <Checkbox
+            {/* <Checkbox
               style={{ height: 25, width: 25, margin: 10 }}
               disabled={false}
               value={autoComedor}
               onValueChange={() => handleLigth("autoComedorOn")}
-              />
+              /> */}
+            <TouchableOpacity  onPress={() =>handleLigth("autoComedorOn")}>
+              {autoComedor
+              ?
+              <MaterialCommunityIcons name="toggle-switch" size={50} color="black" style={{marginHorizontal:10}}/>
+              :
+              <MaterialCommunityIcons name="toggle-switch-off-outline" size={50} color="black" style={{marginHorizontal:10}}/>
+            }
+            </TouchableOpacity>
             <TouchableOpacity  onPress={() =>handleLigth("autoComedorOn")}>
               <Text style={{ fontSize: 15, margin: 5 ,color:"#5D6D7E"}}>Automatico Comedor</Text>
             </TouchableOpacity>
-            <Text>Temporizador</Text>
+            {/* <Text>Temporizador</Text> */}
+            <MaterialIcons name="timer" size={24} color="black" style={{marginHorizontal:10}}/>
             <TextInput style={styles.input} 
               placeholder="000" 
               keyboardType="phone-pad" 
@@ -271,8 +316,11 @@ const handleControlDeLuz = async (value)=>{
           </TouchableOpacity>
           
           </View>
-          <View style={styles.section}>
+          <View style={[styles.section,{justifyContent:"flex-start"}]}>
             <Text style={{ fontSize: 15, margin: 10 ,color:"#5D6D7E"}}>Sensor de luz</Text>
+            <MaterialIcons name="nightlight-round" size={20} color="black" />
+            <Text>/</Text>
+            <Entypo name="light-down" size={24} color="black" />
             <TextInput style={styles.input} 
                 placeholder="000" 
                 keyboardType="phone-pad" 
@@ -282,7 +330,21 @@ const handleControlDeLuz = async (value)=>{
                 />
           </View>
         </View>
-          
+        <Animated.View 
+          style={{
+            opacity:fadeIn,
+            display:"flex",
+            alignItems:"center",
+            flex:1,
+            marginTop:200
+          }}
+        >
+              <MaterialCommunityIcons name="gesture-tap" size={54} color="black" />
+              <FontAwesome name="angle-double-down" size={24} color="black" style={{margin:10}}/>
+           <Text>Tap to refresh</Text>
+        </Animated.View>
+        
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -292,8 +354,15 @@ const styles = StyleSheet.create({
   container: {
     width:"100%",
     flex: 1,
-    paddingTop: StatusBar.currentHeight ,
+    // paddingTop: StatusBar.currentHeight ,
     backgroundColor:"#e5e4e2",
+  },
+  title:{
+    display:"flex",
+    flexDirection:"row",
+    justifyContent:"center",
+    backgroundColor:"#bebebe",
+    padding:20,
   },
   boton: {
     textAlign: "center",
@@ -301,7 +370,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     paddingHorizontal: 20,
-    fontSize: 20,
+    fontSize: 17,
     margin: 5,
   },
   section: {
@@ -309,6 +378,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent:"flex-start",
     alignItems:"center",
+    marginStart:10
   },
   contenedor:{
     // backgroundColor:"#bebebe",
