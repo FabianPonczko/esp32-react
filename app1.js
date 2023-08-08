@@ -237,7 +237,7 @@ const handleControlDeLuz = async (value)=>{
 }
   return (
     <SafeAreaView style={[styles.container,{backgroundColor: darkTheme ? "#17202A":"#e5e4e2"} ]}>
-      <StatusBar  barStyle='dark-content' />
+      <StatusBar  barStyle='ligth' />
       <View style={[styles.title,{backgroundColor:!darkTheme ? "#BDC3C7" :"#D35400"}]}>
         <AntDesign name="home" size={24} color= {darkTheme ? "#ECF0F1" :"#424949" }/>
         <Text style={{marginHorizontal:10,fontSize:16}}>Asistente luces del Hogar</Text>
