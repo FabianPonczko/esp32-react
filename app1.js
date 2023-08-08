@@ -13,7 +13,7 @@ import {
   Animated
 } from "react-native";
 import Checkbox from "expo-checkbox";
-import { MaterialIcons,Entypo ,MaterialCommunityIcons,AntDesign,FontAwesome    } from '@expo/vector-icons';
+import { MaterialIcons,Foundation ,Entypo ,MaterialCommunityIcons,AntDesign,FontAwesome    } from '@expo/vector-icons';
 
 
 const cosinaIp = "http://192.168.100.147:1000";
@@ -27,11 +27,14 @@ function App1() {
   const [autoComedor, setAutoComedor] = useState(false);
   const [intervaloComedor, setIntervaloComedor] = useState("");
   const [controlDeLuz, setControlDeLuz] = useState("");
+  const [darkTheme,setDarkTheme] =  useState(false)
+  const [tap,setTap] = useState(0)
 
   const [onRefresh, setOnRefresh] = useState(false);
 
   const loadData = async () => {
-    
+    setTap(tap+1)
+    console.log(tap)
     //status cocina
     try {
       await fetch(`${cosinaIp}/inicio`)
@@ -89,9 +92,11 @@ function App1() {
     // console.log("**************************************");
     // console.log("status cocina", autoCocina);
     // console.log("status comedor", autoComedor);
+    
   };
   
   const fadeIn = useRef(new Animated.Value(0)).current
+  const fadeInOnce = useRef(new Animated.Value(0)).current
 
   useEffect(() => {
     setOnRefresh(true);
@@ -102,17 +107,24 @@ function App1() {
             Animated.timing(fadeIn,
               {
                 toValue:1,
-                duration:1000,
+                duration:500,
                 useNativeDriver: true,
               }),
               Animated.timing(fadeIn,
                 {
                   toValue:0,
-                  duration:1000,
+                  duration:500,
                   useNativeDriver: true,
                 })
               ]),
             ).start()
+            Animated.timing(fadeInOnce,
+              {
+                toValue:1,
+                duration:1000,
+                useNativeDriver: true,
+              }).start()
+              
             },10000)
           }, []);
 
@@ -224,11 +236,14 @@ const handleControlDeLuz = async (value)=>{
  }
 }
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container,{backgroundColor: darkTheme ? "#17202A":"#e5e4e2"} ]}>
       <StatusBar  barStyle='default' />
-      <View style={styles.title}>
-        <AntDesign name="home" size={24} color="black" />
-        <Text style={{marginHorizontal:10}}>Asistente luces del Hogar</Text>
+      <View style={[styles.title,{backgroundColor:!darkTheme ? "#BDC3C7" :"#D35400"}]}>
+        <AntDesign name="home" size={24} color= {darkTheme ? "#ECF0F1" :"#424949" }/>
+        <Text style={{marginHorizontal:10,fontSize:16}}>Asistente luces del Hogar</Text>
+        <TouchableOpacity onPress={()=>setDarkTheme(!darkTheme)}>
+          <Foundation  name="background-color" size={24} color={darkTheme ? "#ECF0F1" :"#424949"}/>
+        </TouchableOpacity>
       </View>
       <ScrollView
         contentContainerStyle={styles.scrollView}
@@ -248,16 +263,16 @@ const handleControlDeLuz = async (value)=>{
 
               {autoCocina
               ?
-              <MaterialCommunityIcons name="toggle-switch" size={50} color="black" style={{marginHorizontal:10}}/>
+              <MaterialCommunityIcons name="toggle-switch" size={50} color= {darkTheme ? "white":"black"} style={{marginHorizontal:10}}/>
               :
-              <MaterialCommunityIcons name="toggle-switch-off-outline" size={50} color="black" style={{marginHorizontal:10}}/>
+              <MaterialCommunityIcons name="toggle-switch-off-outline" size={50} color={darkTheme ? "white":"black"} style={{marginHorizontal:10}}/>
             }
             </TouchableOpacity>
               <TouchableOpacity onPress={()=>handleLigth("autoCocinaOn")}>
-                <Text style={{ fontSize: 15, margin: 5 ,color:"#5D6D7E"}}>Automatico Cocina</Text>
+                <Text style={{ fontSize: 15, margin: 5 ,color:darkTheme ? "#ECF0F1" :"#424949"}}>Automatico Cocina</Text>
               </TouchableOpacity>
               {/* <Text>Temporizador</Text> */}
-              <MaterialIcons name="timer" size={24} color="black" style={{marginHorizontal:10}}/>
+              <MaterialIcons name="timer" size={24} color={darkTheme ? "white":"black"} style={{marginHorizontal:10}}/>
               <TextInput style={styles.input} 
                 placeholder="000" 
                 keyboardType="phone-pad" 
@@ -267,7 +282,7 @@ const handleControlDeLuz = async (value)=>{
                 />
             </View>
             <TouchableOpacity onPress={() => handleLigth("encender")}>
-              <Text style={[styles.boton, { backgroundColor: "#757575"}]}>
+              <Text style={[styles.boton, { backgroundColor: darkTheme ? "#626567" :"#424949"}]}>
                 Encender
               </Text>
             </TouchableOpacity>
@@ -285,16 +300,16 @@ const handleControlDeLuz = async (value)=>{
             <TouchableOpacity  onPress={() =>handleLigth("autoComedorOn")}>
               {autoComedor
               ?
-              <MaterialCommunityIcons name="toggle-switch" size={50} color="black" style={{marginHorizontal:10}}/>
+              <MaterialCommunityIcons name="toggle-switch" size={50} color={darkTheme ? "white":"black"} style={{marginHorizontal:10}}/>
               :
-              <MaterialCommunityIcons name="toggle-switch-off-outline" size={50} color="black" style={{marginHorizontal:10}}/>
+              <MaterialCommunityIcons name="toggle-switch-off-outline" size={50} color={darkTheme ? "white":"black"} style={{marginHorizontal:10}}/>
             }
             </TouchableOpacity>
             <TouchableOpacity  onPress={() =>handleLigth("autoComedorOn")}>
-              <Text style={{ fontSize: 15, margin: 5 ,color:"#5D6D7E"}}>Automatico Comedor</Text>
+              <Text style={{ fontSize: 15, margin: 5 ,color: darkTheme ? "#ECF0F1" :"#424949"}}>Automatico Comedor</Text>
             </TouchableOpacity>
             {/* <Text>Temporizador</Text> */}
-            <MaterialIcons name="timer" size={24} color="black" style={{marginHorizontal:10}}/>
+            <MaterialIcons name="timer" size={24} color={darkTheme ? "white":"black"} style={{marginHorizontal:10}}/>
             <TextInput style={styles.input} 
               placeholder="000" 
               keyboardType="phone-pad" 
@@ -305,22 +320,22 @@ const handleControlDeLuz = async (value)=>{
 
           </View>
           <TouchableOpacity onPress={() => handleLigth("encender1")}>
-            <Text style={[styles.boton, { backgroundColor: "#757575" }]}>
+            <Text style={[styles.boton, { backgroundColor: darkTheme ? "#626567" :"#424949" }]}>
               Encender
             </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleLigth("encender2")}>
-            <Text style={[styles.boton, { backgroundColor: "#757575" }]}>
+            <Text style={[styles.boton, { backgroundColor: darkTheme ? "#626567" :"#424949" }]}>
               Encender
             </Text>
           </TouchableOpacity>
           
           </View>
           <View style={[styles.section,{justifyContent:"flex-start"}]}>
-            <Text style={{ fontSize: 15, margin: 10 ,color:"#5D6D7E"}}>Sensor de luz</Text>
-            <MaterialIcons name="nightlight-round" size={20} color="black" />
-            <Text>/</Text>
-            <Entypo name="light-down" size={24} color="black" />
+            <Text style={{ fontSize: 15, margin: 10 ,color:darkTheme ? "#ECF0F1" :"#424949"}}>Sensor de luz</Text>
+            <MaterialIcons name="nightlight-round" size={20} color={darkTheme ? "#ECF0F1" :"#424949"} />
+            <Text style={{color:darkTheme ? "#ECF0F1" :"#424949"}}>/</Text>
+            <Entypo name="light-down" size={24} color={darkTheme ? "#ECF0F1" :"#424949"} />
             <TextInput style={styles.input} 
                 placeholder="000" 
                 keyboardType="phone-pad" 
@@ -330,21 +345,31 @@ const handleControlDeLuz = async (value)=>{
                 />
           </View>
         </View>
+      
+        <Animated.View 
+          style={{
+            opacity:fadeInOnce,
+            display:"flex",
+            alignItems:"center",
+            flex:1,
+            marginTop:100,
+          }}
+        >  
+        {tap < 2 ?<MaterialCommunityIcons name="gesture-tap" size={54} color={darkTheme ? "#ECF0F1" :"#424949"} />:null}
+        {tap < 2 ?<Text style={{color:darkTheme ? "#ECF0F1" :"#424949"}}>down to refresh</Text>:null}
+        
+        </Animated.View>
         <Animated.View 
           style={{
             opacity:fadeIn,
             display:"flex",
             alignItems:"center",
             flex:1,
-            marginTop:200
+            // marginTop:100
           }}
         >
-              <MaterialCommunityIcons name="gesture-tap" size={54} color="black" />
-              <FontAwesome name="angle-double-down" size={24} color="black" style={{margin:10}}/>
-           <Text>Tap to refresh</Text>
+          {tap < 2 ?<FontAwesome name="angle-double-down" size={24} color={darkTheme ? "#ECF0F1" :"#424949"} style={{margin:10}}/>:null}
         </Animated.View>
-        
-
       </ScrollView>
     </SafeAreaView>
   );
@@ -355,7 +380,7 @@ const styles = StyleSheet.create({
     width:"100%",
     flex: 1,
     // paddingTop: StatusBar.currentHeight ,
-    backgroundColor:"#e5e4e2",
+    
   },
   title:{
     display:"flex",
@@ -368,8 +393,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "white",
     borderRadius: 5,
-    padding: 10,
-    paddingHorizontal: 20,
+    padding: 15,
+    marginHorizontal: 10,
     fontSize: 17,
     margin: 5,
   },
@@ -384,9 +409,9 @@ const styles = StyleSheet.create({
     // backgroundColor:"#bebebe",
     display:"flex",
     justifyContent:"center",
-    borderColor:"#dcdcdc",
-    borderWidth:1,
-    margin:5
+    borderColor:"#AAB7B8",
+    borderWidth:2,
+    marginVertical:5
   },
   input: {
     borderColor: "#AEB6BF",
