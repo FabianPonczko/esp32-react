@@ -8,13 +8,15 @@ import {
   ScrollView,
   RefreshControl,
   SafeAreaView,
-  StatusBar,
   Vibration,
-  Animated
+  Animated,
+  ToastAndroid
 } from "react-native";
-import Checkbox from "expo-checkbox";
 import { MaterialIcons,Foundation ,Entypo ,MaterialCommunityIcons,AntDesign,FontAwesome    } from '@expo/vector-icons';
-
+import * as Speech from 'expo-speech';
+import * as SecureStore from 'expo-secure-store';
+import Intro from "./intro";
+import { StatusBar } from 'expo-status-bar';
 
 const cosinaIp = "http://192.168.100.147:1000";
 const comedorIp = "http://192.168.100.200:1002";
@@ -26,13 +28,43 @@ function App1() {
   const [intervaloCocina, setIntervaloCocina] = useState("");
   const [autoComedor, setAutoComedor] = useState(false);
   const [intervaloComedor, setIntervaloComedor] = useState("");
+  const [luzComedor1, setLuzComedor1] = useState(false);
+  const [luzComedor1Activado, setLuzComedor1Activado] = useState(false);
+  const [luzComedor2, setLuzComedor2] = useState(false);
+  const [luzComedor2Activado, setLuzComedor2Activado] = useState(false);
+  const [luzCocina, setLuzCocina] = useState(false);
+  const [luzComedor1Encendida, setLuzComedor1Encendida] = useState(false);
+  const [luzComedor2Encendida, setLuzComedor2Encendida] = useState(false);
+  
+  
+
   const [controlDeLuz, setControlDeLuz] = useState("");
   const [darkTheme,setDarkTheme] =  useState(false)
   const [tap,setTap] = useState(0)
 
   const [onRefresh, setOnRefresh] = useState(false);
 
+  async function save() {
+    await SecureStore.setItemAsync("clave", "activado");
+  }
+
+  async function getValueFor() {
+    let result = await SecureStore.getItemAsync("clave");
+    // if (result) {
+    //   alert("🔐 Here's your value 🔐 \n" + result);
+    // } else {
+    //   alert('No values stored under that key.');
+    // }
+    return result
+  }
+
   const loadData = async () => {
+     
+     const firstInicio = await (getValueFor())
+     !firstInicio && save()
+    //  await SecureStore.deleteItemAsync("clave");
+    //   !used && alert.apply("nada")
+    !firstInicio && Speech.speak("bienvenido al asistente de luces del hogar. Con el, podras configurar diferentes funciones, como activar el modo luces en automatico por cada luz en particular, tiempo de encendido, o accionarlas de forma manual, etc.")
     setTap(tap+1)
     console.log(tap)
     //status cocina
@@ -93,6 +125,20 @@ function App1() {
     // console.log("status cocina", autoCocina);
     // console.log("status comedor", autoComedor);
     
+    await fetch(`${cosinaIp}/Lucesinicio`)
+    .then((res) => {
+      return res.text();
+    })
+    .then((resp) => {
+      const luz1 = resp.substring(11,12)
+      const luz1Encendida = resp.substring(13,14)
+      const luz2 = resp.substring(12,13)
+      const luz2Encendida = resp.substring(14,15)
+        setLuzComedor1Activado(luz1==1?true:false)
+        setLuzComedor1Encendida(luz1Encendida==1?true:false)
+        setLuzComedor2Activado(luz2==1?true:false)
+        setLuzComedor2Encendida(luz2Encendida==1?true:false)
+    })
   };
   
   const fadeIn = useRef(new Animated.Value(0)).current
@@ -125,11 +171,12 @@ function App1() {
                 useNativeDriver: true,
               }).start()
               
-            },10000)
+            },18000)
           }, []);
 
   const handleLigth = (data) => {
     Vibration.vibrate()
+    // Speech.speak("encendiendo");
     console.log("data: ", data);
 
     let sendDataCocina = "";
@@ -149,12 +196,22 @@ function App1() {
       case "encender":
         sendDataCocina = data;
         break;
-
+        case "luzcomedor1":
+          sendDataCocina = data;
+          break;
+        case "luzcomedor2":
+          sendDataCocina = data;
+          break;
+        case "Lucesinicio":
+          sendDataCocina = data;
+          break;
       //comedor
       case "autoComedorOn":
+        
         !autoComedor
-          ? (sendDataCocina = "autoonpircomedor")
-          : (sendDataCocina = "autoofpircomedor");
+          ? (sendDataCocina = "autoonpircomedor",sendDataComedor = "autoon")
+          : (sendDataCocina = "autoofpircomedor",sendDataComedor = "autooff")
+          
         setAutoComedor(!autoComedor);
 
         break;
@@ -164,7 +221,6 @@ function App1() {
       case "encender2":
         sendDataComedor = data;
         break;
-
       default:
         break;
     }
@@ -173,10 +229,35 @@ function App1() {
       try {
         fetch(`${comedorIp}/${sendDataComedor}`)
           .then((resp) => {
-            return resp.text();
-          })
-          .then((data) => console.log(data));
-      } catch (error) {
+            return resp.text()
+            })
+            .then(respuesta=>{
+              switch (respuesta){
+                case "Encend1on10":
+                  console.log("1")
+                  setLuzComedor1(true)
+                  break;
+                  case "Encend1of10":
+                    console.log("2")
+                    setLuzComedor1(false)
+                    break;
+                    case "Encend2on10":
+                      console.log("3")
+                      setLuzComedor2(true)
+                      break;
+                    case "Encend2of10":
+                        console.log("4")
+                        setLuzComedor2(false)
+                      break;
+                    case "Automatico Off":
+                      console.log("5, Automatico Off")
+                    break;
+                          
+                        default:
+                            console.log("ssssssssss")
+              }
+            })
+          } catch (error) {
         console.log(error);
       }
     }
@@ -186,7 +267,40 @@ function App1() {
           .then((resp) => {
             return resp.text();
           })
-          .then((data) => console.log(data));
+          .then((respuesta) => {
+            console.log(respuesta)
+            switch (respuesta){
+              case "Encendido":
+                setLuzCocina(true)
+                break;
+              case "Apagadooo":
+                setLuzCocina(false)
+                break;
+                case "luzcomedor1On-1":
+                  console.log("5")
+                  setLuzComedor1Activado(true)
+                break;
+                case "luzcomedor1On-0":
+                  console.log("5")
+                  setLuzComedor1Activado(false)
+                break;
+                case "luzcomedor2On-1":
+                  console.log("6")
+                  setLuzComedor2Activado(true)
+                break;
+                
+                case "luzcomedor2On-0":
+                  console.log("7")
+                  setLuzComedor2Activado(false)
+                break;
+                case "Lucesinicio":
+                  console.log("6")
+                  loadData()
+                break;
+              default :
+                console.log("sin dato")
+            }
+          });
       } catch (error) {
         console.log(error);
       }
@@ -200,7 +314,7 @@ function App1() {
        try {
         await fetch(`${cosinaIp}/grabatiempo=${valor}`)
           .then((res) => {
-            Alert.alert("tiempo actualizado")
+            ToastAndroid.show('Tiempo actualizado!', ToastAndroid.SHORT);
             return res.text()
           })
                    
@@ -215,13 +329,23 @@ function App1() {
     try {
      await fetch(`${cosinaIp}/Cgrabatiemp=${valor}`)
        .then((res) => {
-         Alert.alert("tiempo actualizado")
+        //  Alert.alert("tiempo actualizado")
          return res.text()
        })
                 
    } catch (error) {
      console.log(error);
    }
+   try {
+    await fetch(`${comedorIp}/grabatiempo=${valor}`)
+      .then((res) => {
+        ToastAndroid.show('Tiempo actualizado!', ToastAndroid.SHORT);
+        return res.text()
+      })
+               
+  } catch (error) {
+    console.log(error);
+  }
 }
 const handleControlDeLuz = async (value)=>{
   try {
@@ -237,7 +361,9 @@ const handleControlDeLuz = async (value)=>{
 }
   return (
     <SafeAreaView style={[styles.container,{backgroundColor: darkTheme ? "#17202A":"#e5e4e2"} ]}>
-      <StatusBar  barStyle='ligth' />
+      <StatusBar style="inverted" backgroundColor= "black" />
+      {onRefresh?<Intro/>
+      :<View>
       <View style={[styles.title,{backgroundColor:!darkTheme ? "#BDC3C7" :"#D35400"}]}>
         <AntDesign name="home" size={24} color= {darkTheme ? "#ECF0F1" :"#424949" }/>
         <Text style={{marginHorizontal:10,fontSize:16}}>Asistente luces del Hogar</Text>
@@ -263,7 +389,7 @@ const handleControlDeLuz = async (value)=>{
 
               {autoCocina
               ?
-              <MaterialCommunityIcons name="toggle-switch" size={50} color= {darkTheme ? "white":"black"} style={{marginHorizontal:10}}/>
+              <MaterialCommunityIcons name="toggle-switch" size={50} color= {darkTheme ? "#8bbe1b":"#21421e"} style={{marginHorizontal:10}}/>
               :
               <MaterialCommunityIcons name="toggle-switch-off-outline" size={50} color={darkTheme ? "white":"black"} style={{marginHorizontal:10}}/>
             }
@@ -281,9 +407,10 @@ const handleControlDeLuz = async (value)=>{
                 onSubmitEditing={(value) => handleIntervalCocina(value.nativeEvent.text)}
                 />
             </View>
-            <TouchableOpacity onPress={() => handleLigth("encender")}>
-              <Text style={[styles.boton, { backgroundColor: darkTheme ? "#626567" :"#424949"}]}>
-                Encender
+            <TouchableOpacity disabled={autoCocina} onPress={() => handleLigth("encender")}>
+              <Text style={[styles.boton, { backgroundColor: darkTheme ? "#424949" :"#424949"}]}>
+              {!luzCocina?"Encender":"Apagar"}
+              {autoCocina && <Foundation name="prohibited" size={24} color="red" />}
               </Text>
             </TouchableOpacity>
           </View>
@@ -296,11 +423,11 @@ const handleControlDeLuz = async (value)=>{
               disabled={false}
               value={autoComedor}
               onValueChange={() => handleLigth("autoComedorOn")}
-              /> */}
+            /> */}
             <TouchableOpacity  onPress={() =>handleLigth("autoComedorOn")}>
               {autoComedor
               ?
-              <MaterialCommunityIcons name="toggle-switch" size={50} color={darkTheme ? "white":"black"} style={{marginHorizontal:10}}/>
+              <MaterialCommunityIcons name="toggle-switch" size={50} color={darkTheme ? "#8bbe1b":"#21421e"} style={{marginHorizontal:10}}/>
               :
               <MaterialCommunityIcons name="toggle-switch-off-outline" size={50} color={darkTheme ? "white":"black"} style={{marginHorizontal:10}}/>
             }
@@ -317,16 +444,22 @@ const handleControlDeLuz = async (value)=>{
               onChangeText={(value) => setIntervaloComedor(value)}
               onSubmitEditing={(value) => handleIntervalComedor(value.nativeEvent.text)}
             />
-
           </View>
-          <TouchableOpacity onPress={() => handleLigth("encender1")}>
-            <Text style={[styles.boton, { backgroundColor: darkTheme ? "#626567" :"#424949" }]}>
-              Encender
+          
+
+          <TouchableOpacity disabled={autoComedor} onPress={() => handleLigth("encender1")}>
+            {/* <Text style={[styles.boton, { backgroundColor: darkTheme ? "#626567":"#424949" }]}> */}
+            <Text style={[styles.boton, {backgroundColor: luzComedor1 || luzComedor1Encendida ? "#008000":"#424949" }]}>
+              {!luzComedor1?"Encender1":"Apagar"}
+              {autoComedor && <Foundation name="prohibited" size={24} color="red" />}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleLigth("encender2")}>
-            <Text style={[styles.boton, { backgroundColor: darkTheme ? "#626567" :"#424949" }]}>
-              Encender
+          
+            
+          <TouchableOpacity disabled={autoComedor} onPress={() => handleLigth("encender2")}>
+            <Text style={[styles.boton, {backgroundColor: luzComedor2 || luzComedor2Encendida ? "#008000":"#424949" }]}>
+              {!luzComedor2?"Encender2":"Apagar"}
+              {autoComedor && <Foundation name="prohibited" size={24} color="red"/>}
             </Text>
           </TouchableOpacity>
           
@@ -345,7 +478,17 @@ const handleControlDeLuz = async (value)=>{
                 />
           </View>
         </View>
-      
+        <View style={styles.bombilla}>
+        <TouchableOpacity disabled={!autoComedor} onPress={() => handleLigth("luzcomedor1")}>
+          {luzComedor1Activado ? <MaterialCommunityIcons name="lightbulb-auto-outline" size={64} color={!darkTheme?"black":"white"} />:<MaterialCommunityIcons name="lightbulb-off-outline" size={64} color={!darkTheme?"black":"white"} />}
+        </TouchableOpacity>
+        <TouchableOpacity disabled={!autoComedor} onPress={() => handleLigth("luzcomedor2")}>
+          {luzComedor2Activado ? <MaterialCommunityIcons name="lightbulb-auto-outline" size={64} color={!darkTheme?"black":"white"} />:<MaterialCommunityIcons name="lightbulb-off-outline" size={64} color={!darkTheme?"black":"white"} />}
+        </TouchableOpacity>
+        <TouchableOpacity disabled={!autoComedor} onPress={() => handleLigth("Lucesinicio")}>
+          <MaterialCommunityIcons name="lightbulb-multiple-outline" size={64} color={!darkTheme?"black":"white"} />
+        </TouchableOpacity>
+        </View>
         <Animated.View 
           style={{
             opacity:fadeInOnce,
@@ -371,6 +514,7 @@ const handleControlDeLuz = async (value)=>{
           {tap < 2 ?<FontAwesome name="angle-double-down" size={24} color={darkTheme ? "#ECF0F1" :"#424949"} style={{margin:10}}/>:null}
         </Animated.View>
       </ScrollView>
+      </View>}
     </SafeAreaView>
   );
 }
@@ -379,8 +523,7 @@ const styles = StyleSheet.create({
   container: {
     width:"100%",
     flex: 1,
-    // paddingTop: StatusBar.currentHeight ,
-    
+    paddingTop: 40
   },
   title:{
     display:"flex",
@@ -389,7 +532,7 @@ const styles = StyleSheet.create({
     backgroundColor:"#bebebe",
     padding:20,
   },
-  boton: {
+  boton: {  
     textAlign: "center",
     color: "white",
     borderRadius: 5,
@@ -423,6 +566,16 @@ const styles = StyleSheet.create({
     padding:5,
     marginLeft:5
   },
+  bombilla:{
+    display:"flex",
+    flexDirection:"row",
+    width:"90%",
+    justifyContent:"space-around",
+    marginTop:40
+
+
+
+  },  
 });
 
 export default App1;
