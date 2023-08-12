@@ -9,13 +9,14 @@ import {
   RefreshControl,
   SafeAreaView,
   Animated,
-  ToastAndroid
+  ToastAndroid,
+  StatusBar
 } from "react-native";
 import { MaterialIcons,Foundation ,Entypo ,MaterialCommunityIcons,AntDesign,FontAwesome    } from '@expo/vector-icons';
 import * as Speech from 'expo-speech';
 import * as SecureStore from 'expo-secure-store';
 import Intro from "./intro";
-import { StatusBar } from 'expo-status-bar';
+import { StatusBar as StatusBarExpo} from 'expo-status-bar';
 
 const cosinaIp = "http://192.168.100.147:1000";
 const comedorIp = "http://192.168.100.200:1002";
@@ -211,7 +212,7 @@ function App1() {
       case "autoComedorOn":
         
         !autoComedor
-          ? (sendDataCocina = "autoonpircomedor",sendDataComedor = "autoon")
+          ? (sendDataCocina = "autoonpircomedor",sendDataComedor = "autoon",setLuzComedor1(false),setLuzComedor2(false))
           : (sendDataCocina = "autoofpircomedor",sendDataComedor = "autooff")
           
         setAutoComedor(!autoComedor);
@@ -235,24 +236,26 @@ function App1() {
             })
             .then(respuesta=>{
               switch (respuesta){
-                case `Encend1on${intervaloComedor}`:
-                  console.log(`Encend1on${intervaloComedor}`)
+                case `Encend1on${intervaloComedor*3}`:
+                  console.log(`Encend1on${intervaloComedor*3}`)
                   setLuzComedor1(true)
                   break;
-                  case `Encend1of${intervaloComedor}`:
-                    console.log(`Encend1of${intervaloComedor}`)
+                  case `Encend1of${intervaloComedor*3}`:
+                    console.log(`Encend1of${intervaloComedor*3}`)
                     setLuzComedor1(false)
                     break;
-                    case `Encend2on${intervaloComedor}`:
-                      console.log(`Encend2on${intervaloComedor}`)
+                    case `Encend2on${intervaloComedor*3}`:
+                      console.log(`Encend2on${intervaloComedor*3}`)
                       setLuzComedor2(true)
                       break;
-                    case `Encend2of${intervaloComedor}`:
-                        console.log(`Encend2of${intervaloComedor}`)
+                    case `Encend2of${intervaloComedor*3}`:
+                        console.log(`Encend2of${intervaloComedor*3}`)
                         setLuzComedor2(false)
                       break;
                     case "Automatico Off":
                       console.log("5, Automatico Off")
+                      setLuzComedor1(false)
+                      setLuzComedor2(false)
                     break;
                           
                         default:
@@ -363,7 +366,7 @@ const handleControlDeLuz = async (value)=>{
 }
   return (
     <SafeAreaView style={[styles.container,{backgroundColor: darkTheme ? "#17202A":"#e5e4e2"} ]}>
-      <StatusBar style="inverted" backgroundColor= "black" />
+      <StatusBarExpo style="inverted" backgroundColor= "black" />
       {onRefresh?<Intro/>
       :<View>
       <View style={[styles.title,{backgroundColor:!darkTheme ? "#2471A3" :"#D35400"}]}>
@@ -533,9 +536,9 @@ const handleControlDeLuz = async (value)=>{
 
 const styles = StyleSheet.create({
   container: {
-    width:"100%",
     flex: 1,
-    paddingTop: 24
+    width:"100%",
+    marginTop: StatusBar.currentHeight
   },
   title:{
     display:"flex",
