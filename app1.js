@@ -233,20 +233,20 @@ function App1() {
             })
             .then(respuesta=>{
               switch (respuesta){
-                case "Encend1on10":
-                  console.log("1")
+                case `Encend1on${intervaloComedor}`:
+                  console.log(`Encend1on${intervaloComedor}`)
                   setLuzComedor1(true)
                   break;
-                  case "Encend1of10":
-                    console.log("2")
+                  case `Encend1of${intervaloComedor}`:
+                    console.log(`Encend1of${intervaloComedor}`)
                     setLuzComedor1(false)
                     break;
-                    case "Encend2on10":
-                      console.log("3")
+                    case `Encend2on${intervaloComedor}`:
+                      console.log(`Encend2on${intervaloComedor}`)
                       setLuzComedor2(true)
                       break;
-                    case "Encend2of10":
-                        console.log("4")
+                    case `Encend2of${intervaloComedor}`:
+                        console.log(`Encend2of${intervaloComedor}`)
                         setLuzComedor2(false)
                       break;
                     case "Automatico Off":
@@ -277,24 +277,24 @@ function App1() {
                 setLuzCocina(false)
                 break;
                 case "luzcomedor1On-1":
-                  console.log("5")
+                  console.log("luzcomedor1On-1")
                   setLuzComedor1Activado(true)
                 break;
                 case "luzcomedor1On-0":
-                  console.log("5")
+                  console.log("luzcomedor1On-0")
                   setLuzComedor1Activado(false)
                 break;
                 case "luzcomedor2On-1":
-                  console.log("6")
+                  console.log("luzcomedor2On-1")
                   setLuzComedor2Activado(true)
                 break;
                 
                 case "luzcomedor2On-0":
-                  console.log("7")
+                  console.log("luzcomedor2On-0")
                   setLuzComedor2Activado(false)
                 break;
                 case "Lucesinicio":
-                  console.log("6")
+                  console.log("Lucesinicio")
                   loadData()
                 break;
               default :
@@ -337,7 +337,7 @@ function App1() {
      console.log(error);
    }
    try {
-    await fetch(`${comedorIp}/grabatiempo=${valor}`)
+    await fetch(`${comedorIp}/grabatiempo=${valor+500}`)
       .then((res) => {
         ToastAndroid.show('Tiempo actualizado!', ToastAndroid.SHORT);
         return res.text()
