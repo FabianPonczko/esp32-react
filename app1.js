@@ -337,7 +337,7 @@ function App1() {
      console.log(error);
    }
    try {
-    await fetch(`${comedorIp}/grabatiempo=${valor+500}`)
+    await fetch(`${comedorIp}/grabatiempo=${valor*3}`)
       .then((res) => {
         ToastAndroid.show('Tiempo actualizado!', ToastAndroid.SHORT);
         return res.text()
