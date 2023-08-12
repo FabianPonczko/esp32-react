@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Alert, Button, TextInput } from "react-native";
+import { Alert,  TextInput } from "react-native";
 import {
   StyleSheet,
   Text,
@@ -8,7 +8,6 @@ import {
   ScrollView,
   RefreshControl,
   SafeAreaView,
-  Vibration,
   Animated,
   ToastAndroid
 } from "react-native";
@@ -39,6 +38,8 @@ function App1() {
   
 
   const [controlDeLuz, setControlDeLuz] = useState("");
+  const [sensorDeLuz, setSensorDeLuz] = useState("");
+
   const [darkTheme,setDarkTheme] =  useState(false)
   const [tap,setTap] = useState(0)
 
@@ -87,7 +88,9 @@ function App1() {
             let positionInicial= resp.search("controldeluz")
             let positionFinal= resp.search("entrada")
             setControlDeLuz(resp.substring(positionFinal,positionInicial+12))
-
+                        
+            let positionInicialValorAnalogico= resp.search("valoranalogico")
+            setSensorDeLuz(resp.substring(positionInicialValorAnalogico+14,positionInicial))
 
           } else {
             setAutoCocina(false);
@@ -175,7 +178,6 @@ function App1() {
           }, []);
 
   const handleLigth = (data) => {
-    Vibration.vibrate()
     // Speech.speak("encendiendo");
     console.log("data: ", data);
 
@@ -364,11 +366,11 @@ const handleControlDeLuz = async (value)=>{
       <StatusBar style="inverted" backgroundColor= "black" />
       {onRefresh?<Intro/>
       :<View>
-      <View style={[styles.title,{backgroundColor:!darkTheme ? "#BDC3C7" :"#D35400"}]}>
-        <AntDesign name="home" size={24} color= {darkTheme ? "#ECF0F1" :"#424949" }/>
-        <Text style={{marginHorizontal:10,fontSize:16}}>Asistente luces del Hogar</Text>
+      <View style={[styles.title,{backgroundColor:!darkTheme ? "#2471A3" :"#D35400"}]}>
+        <AntDesign name="home" size={24} color= {darkTheme ? "#ECF0F1" :"#ECF0F1" }/>
+        <Text style={{marginHorizontal:10,fontSize:20,color:"#ECF0F1"}}>Asistente luces del Hogar</Text>
         <TouchableOpacity onPress={()=>setDarkTheme(!darkTheme)}>
-          <Foundation  name="background-color" size={24} color={darkTheme ? "#ECF0F1" :"#424949"}/>
+          <Foundation  name="background-color" size={24} color={darkTheme ? "#F1948A" :"#7FB3D5"} style={{marginLeft:45}}/>
         </TouchableOpacity>
       </View>
       <ScrollView
@@ -406,6 +408,11 @@ const handleControlDeLuz = async (value)=>{
                 onChangeText={(value) => setIntervaloCocina(value)}
                 onSubmitEditing={(value) => handleIntervalCocina(value.nativeEvent.text)}
                 />
+                {autoCocina
+                ?
+                <MaterialCommunityIcons name="motion-sensor" size={34} color= {darkTheme ? "#8bbe1b":"#21421e"} style={{marginLeft:20}} />              :
+                <MaterialCommunityIcons name="motion-sensor-off" size={34} color={darkTheme ? "white":"black"} style={{marginLeft:20}} />
+                }
             </View>
             <TouchableOpacity disabled={autoCocina} onPress={() => handleLigth("encender")}>
               <Text style={[styles.boton, { backgroundColor: darkTheme ? "#424949" :"#424949"}]}>
@@ -444,6 +451,11 @@ const handleControlDeLuz = async (value)=>{
               onChangeText={(value) => setIntervaloComedor(value)}
               onSubmitEditing={(value) => handleIntervalComedor(value.nativeEvent.text)}
             />
+            {autoComedor
+                ?
+                <MaterialCommunityIcons name="motion-sensor" size={34} color= {darkTheme ? "#8bbe1b":"#21421e"} style={{marginLeft:20}} />              :
+                <MaterialCommunityIcons name="motion-sensor-off" size={34} color={darkTheme ? "white":"black"} style={{marginLeft:20}} />
+                }
           </View>
           
 
@@ -476,17 +488,18 @@ const handleControlDeLuz = async (value)=>{
                 onChangeText={(value) => setControlDeLuz(value)}
                 onSubmitEditing={(value) => handleControlDeLuz(value.nativeEvent.text)}             
                 />
+              <Entypo name="light-down" size={24} color="black" style={{color:darkTheme ? "#ECF0F1" :"#424949",marginLeft:20}}/>
+              <Text style={{ fontSize: 15,color:darkTheme ? "#ECF0F1" :"#424949"}}>{sensorDeLuz}</Text>
           </View>
         </View>
         <View style={styles.bombilla}>
         <TouchableOpacity disabled={!autoComedor} onPress={() => handleLigth("luzcomedor1")}>
           {luzComedor1Activado ? <MaterialCommunityIcons name="lightbulb-auto-outline" size={64} color={!darkTheme?"black":"white"} />:<MaterialCommunityIcons name="lightbulb-off-outline" size={64} color={!darkTheme?"black":"white"} />}
+        <Text style={{ fontSize: 15,color:darkTheme ? "#ECF0F1" :"#424949"}}>Lampara 1</Text>
         </TouchableOpacity>
         <TouchableOpacity disabled={!autoComedor} onPress={() => handleLigth("luzcomedor2")}>
           {luzComedor2Activado ? <MaterialCommunityIcons name="lightbulb-auto-outline" size={64} color={!darkTheme?"black":"white"} />:<MaterialCommunityIcons name="lightbulb-off-outline" size={64} color={!darkTheme?"black":"white"} />}
-        </TouchableOpacity>
-        <TouchableOpacity disabled={!autoComedor} onPress={() => handleLigth("Lucesinicio")}>
-          <MaterialCommunityIcons name="lightbulb-multiple-outline" size={64} color={!darkTheme?"black":"white"} />
+          <Text style={{ fontSize: 15,color:darkTheme ? "#ECF0F1" :"#424949"}}>Lampara 2</Text>
         </TouchableOpacity>
         </View>
         <Animated.View 
@@ -495,11 +508,10 @@ const handleControlDeLuz = async (value)=>{
             display:"flex",
             alignItems:"center",
             flex:1,
-            marginTop:100,
           }}
         >  
-        {tap < 2 ?<MaterialCommunityIcons name="gesture-tap" size={54} color={darkTheme ? "#ECF0F1" :"#424949"} />:null}
-        {tap < 2 ?<Text style={{color:darkTheme ? "#ECF0F1" :"#424949"}}>down to refresh</Text>:null}
+        {tap < 2 && <MaterialCommunityIcons name="gesture-tap" size={54} color={darkTheme ? "#ECF0F1" :"#424949"} />}
+        {tap < 2 && <Text style={{color:darkTheme ? "#ECF0F1" :"#424949"}}>down to refresh</Text>}
         
         </Animated.View>
         <Animated.View 
@@ -511,7 +523,7 @@ const handleControlDeLuz = async (value)=>{
             // marginTop:100
           }}
         >
-          {tap < 2 ?<FontAwesome name="angle-double-down" size={24} color={darkTheme ? "#ECF0F1" :"#424949"} style={{margin:10}}/>:null}
+          {tap < 2 ?<FontAwesome name="angle-double-down" size={24} color={darkTheme ? "#ECF0F1" :"#424949"} style={{margin:1}}/>:null}
         </Animated.View>
       </ScrollView>
       </View>}
@@ -523,7 +535,7 @@ const styles = StyleSheet.create({
   container: {
     width:"100%",
     flex: 1,
-    paddingTop: 40
+    paddingTop: 24
   },
   title:{
     display:"flex",
@@ -531,6 +543,8 @@ const styles = StyleSheet.create({
     justifyContent:"center",
     backgroundColor:"#bebebe",
     padding:20,
+    borderWidth:1,
+    borderColor:"#839192",
   },
   boton: {  
     textAlign: "center",
@@ -546,7 +560,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent:"flex-start",
     alignItems:"center",
-    marginStart:10
+    marginStart:0
   },
   contenedor:{
     // backgroundColor:"#bebebe",
@@ -569,9 +583,9 @@ const styles = StyleSheet.create({
   bombilla:{
     display:"flex",
     flexDirection:"row",
-    width:"90%",
-    justifyContent:"space-around",
-    marginTop:40
+    width:"100%",
+    justifyContent:"space-evenly",
+    marginTop:20
 
 
 
