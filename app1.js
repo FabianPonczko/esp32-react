@@ -366,7 +366,7 @@ const handleControlDeLuz = async (value)=>{
 }
   return (
     <SafeAreaView style={[styles.container,{backgroundColor: darkTheme ? "#17202A":"#e5e4e2"} ]}>
-      <StatusBarExpo style="ligth" backgroundColor= "black" />
+      <StatusBarExpo style="ligth" backgroundColor= {!darkTheme ? "#2471A3" :"#D35400"} />
       {onRefresh?<Intro/>
       :<View>
       <View style={[styles.title,{backgroundColor:!darkTheme ? "#2471A3" :"#D35400"}]}>
@@ -546,8 +546,7 @@ const styles = StyleSheet.create({
     justifyContent:"center",
     backgroundColor:"#bebebe",
     padding:20,
-    borderWidth:1,
-    borderColor:"#839192",
+    
   },
   boton: {  
     textAlign: "center",
