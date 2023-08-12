@@ -366,7 +366,7 @@ const handleControlDeLuz = async (value)=>{
 }
   return (
     <SafeAreaView style={[styles.container,{backgroundColor: darkTheme ? "#17202A":"#e5e4e2"} ]}>
-      <StatusBarExpo style="inverted" backgroundColor= "black" />
+      <StatusBarExpo style="ligth" backgroundColor= "black" />
       {onRefresh?<Intro/>
       :<View>
       <View style={[styles.title,{backgroundColor:!darkTheme ? "#2471A3" :"#D35400"}]}>
