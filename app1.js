@@ -10,13 +10,14 @@ import {
   SafeAreaView,
   Animated,
   ToastAndroid,
-  StatusBar
+  StatusBar,
 } from "react-native";
 import { MaterialIcons,Foundation ,Entypo ,MaterialCommunityIcons,AntDesign,FontAwesome    } from '@expo/vector-icons';
 import * as Speech from 'expo-speech';
 import * as SecureStore from 'expo-secure-store';
 import Intro from "./intro";
 import { StatusBar as StatusBarExpo} from 'expo-status-bar';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const cosinaIp = "http://192.168.100.147:1000";
 const comedorIp = "http://192.168.100.200:1002";
@@ -52,11 +53,6 @@ function App1() {
 
   async function getValueFor() {
     let result = await SecureStore.getItemAsync("clave");
-    // if (result) {
-    //   alert("🔐 Here's your value 🔐 \n" + result);
-    // } else {
-    //   alert('No values stored under that key.');
-    // }
     return result
   }
 
@@ -64,11 +60,9 @@ function App1() {
      
      const firstInicio = await (getValueFor())
      !firstInicio && save()
-    //  await SecureStore.deleteItemAsync("clave");
-    //   !used && alert.apply("nada")
-    !firstInicio && Speech.speak("bienvenido al asistente de luces del hogar. Con el, podras configurar diferentes funciones, como activar el modo luces en automatico por cada luz en particular, tiempo de encendido, o accionarlas de forma manual, etc.")
+     !firstInicio && Speech.speak("bienvenido al asistente de luces del hogar. Con el, podras configurar diferentes funciones, como activar el modo luces en automatico por cada luz en particular, tiempo de encendido, o accionarlas de forma manual, etc.")
     setTap(tap+1)
-    console.log(tap)
+    
     //status cocina
     try {
       await fetch(`${cosinaIp}/inicio`)
@@ -104,31 +98,8 @@ function App1() {
         
     } catch (error) {
       console.log(error);
-    }
-
-    //status comedor
-    try {
-      await fetch(`${comedorIp}/inicio`)
-        .then((res) => {
-          return res.text();
-        })
-        .then((resp) => {
-          if (resp.includes("Checkbox")) {
-            // setAutoComedor(true);
-            // setIntervaloComedor(resp.substring(22,19))
-            
-          } else {
-            // setAutoComedor();
-            // setIntervaloComedor(resp.substring(12,9))
-          }
-        })
-      } catch (error) {
-        console.log(error);
-      }finally{setOnRefresh(false)}
-    // console.log("**************************************");
-    // console.log("status cocina", autoCocina);
-    // console.log("status comedor", autoComedor);
-    
+    }finally{setOnRefresh(false)}
+   
     await fetch(`${cosinaIp}/Lucesinicio`)
     .then((res) => {
       return res.text();
@@ -329,7 +300,7 @@ function App1() {
   }
   const handleIntervalComedor = async (interval)=>{
     //status cocina
-    const valor =interval * 1000
+    const valor = interval * 1000
      
     try {
      await fetch(`${cosinaIp}/Cgrabatiemp=${valor}`)
@@ -342,7 +313,7 @@ function App1() {
      console.log(error);
    }
    try {
-    await fetch(`${comedorIp}/grabatiempo=${valor*3}`)
+    await fetch(`${comedorIp}/grabatiempo=${valor*300}`)
       .then((res) => {
         ToastAndroid.show('Tiempo actualizado!', ToastAndroid.SHORT);
         return res.text()
@@ -366,9 +337,16 @@ const handleControlDeLuz = async (value)=>{
 }
   return (
     <SafeAreaView style={[styles.container,{backgroundColor: darkTheme ? "#17202A":"#e5e4e2"} ]}>
-      <StatusBarExpo style="ligth" backgroundColor= {!darkTheme ? "#2471A3" :"#D35400"} />
+      <StatusBarExpo style="inverted" backgroundColor= {!darkTheme ? "#2471A3" :"#D35400"} />
       {onRefresh?<Intro/>
       :<View>
+
+      {/* <LinearGradient
+      colors={ !darkTheme ? ['#D6DBDF','#ECF0F1']:['black', 'white']}
+      style={styles.box}
+      start={{ x: 0.5, y: 0.1 }}
+      end={{ x: 0.5, y: 1 }}
+      > */}
       <View style={[styles.title,{backgroundColor:!darkTheme ? "#2471A3" :"#D35400"}]}>
         <AntDesign name="home" size={24} color= {darkTheme ? "#ECF0F1" :"#ECF0F1" }/>
         <Text style={{marginHorizontal:10,fontSize:20,color:"#ECF0F1"}}>Asistente luces del Hogar</Text>
@@ -376,11 +354,14 @@ const handleControlDeLuz = async (value)=>{
           <Foundation  name="background-color" size={24} color={darkTheme ? "#F1948A" :"#7FB3D5"} style={{marginLeft:45}}/>
         </TouchableOpacity>
       </View>
+      
+
       <ScrollView
         contentContainerStyle={styles.scrollView}
         refreshControl={
           <RefreshControl refreshing={onRefresh} onRefresh={loadData} />}
       >
+              
         <View>
           <View style={styles.contenedor}>
             <View style={styles.section}>
@@ -481,7 +462,7 @@ const handleControlDeLuz = async (value)=>{
           </View>
           <View style={[styles.section,{justifyContent:"flex-start"}]}>
             <Text style={{ fontSize: 15, margin: 10 ,color:darkTheme ? "#ECF0F1" :"#424949"}}>Sensor de luz</Text>
-            <MaterialIcons name="nightlight-round" size={20} color={darkTheme ? "#ECF0F1" :"#424949"} />
+            <MaterialIcons name="nightlight-round" size={20} color={darkTheme ? "#ECF0F1" :"#424949"}/>
             <Text style={{color:darkTheme ? "#ECF0F1" :"#424949"}}>/</Text>
             <Entypo name="light-down" size={24} color={darkTheme ? "#ECF0F1" :"#424949"} />
             <TextInput style={styles.input} 
@@ -491,7 +472,11 @@ const handleControlDeLuz = async (value)=>{
                 onChangeText={(value) => setControlDeLuz(value)}
                 onSubmitEditing={(value) => handleControlDeLuz(value.nativeEvent.text)}             
                 />
-              <Entypo name="light-down" size={24} color="black" style={{color:darkTheme ? "#ECF0F1" :"#424949",marginLeft:20}}/>
+              {!sensorDeLuz<990?
+              <MaterialIcons name="nightlight-round" size={24} style={{color:darkTheme ? "#ECF0F1" :"#424949",marginLeft:20}}/>
+              :
+              <Entypo name="light-down" size={24} style={{color:darkTheme ? "#ECF0F1" :"#424949",marginLeft:20}}/>
+              }
               <Text style={{ fontSize: 15,color:darkTheme ? "#ECF0F1" :"#424949"}}>{sensorDeLuz}</Text>
           </View>
         </View>
@@ -529,12 +514,18 @@ const handleControlDeLuz = async (value)=>{
           {tap < 2 ?<FontAwesome name="angle-double-down" size={24} color={darkTheme ? "#ECF0F1" :"#424949"} style={{margin:1}}/>:null}
         </Animated.View>
       </ScrollView>
+      {/* </LinearGradient> */}
       </View>}
+
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  box: {
+    width: '100%',
+    height: 800,
+  },
   container: {
     flex: 1,
     width:"100%",
@@ -555,22 +546,23 @@ const styles = StyleSheet.create({
     padding: 15,
     marginHorizontal: 10,
     fontSize: 17,
-    margin: 5,
+    margin:5
   },
   section: {
     display: "flex",
     flexDirection: "row",
     justifyContent:"flex-start",
     alignItems:"center",
-    marginStart:0
   },
   contenedor:{
     // backgroundColor:"#bebebe",
     display:"flex",
     justifyContent:"center",
-    borderColor:"#AAB7B8",
-    borderWidth:2,
-    marginVertical:5
+    // borderColor:"#AAB7B8",
+    // marginTop:5
+    // borderWidth:2,
+      // marginVertical:10,
+    // backgroundColor:"#2471A3"
   },
   input: {
     borderColor: "#AEB6BF",
@@ -588,9 +580,6 @@ const styles = StyleSheet.create({
     width:"100%",
     justifyContent:"space-evenly",
     marginTop:20
-
-
-
   },  
 });
 
