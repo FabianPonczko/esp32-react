@@ -62,6 +62,7 @@ function App1() {
      !firstInicio && save()
      !firstInicio && Speech.speak("bienvenido al asistente de luces del hogar. Con el, podras configurar diferentes funciones, como activar el modo luces en automatico por cada luz en particular, tiempo de encendido, o accionarlas de forma manual, etc.")
     setTap(tap+1)
+    console.log("Tap:" , tap)
     
     //status cocina
     try {
@@ -437,7 +438,8 @@ const handleControlDeLuz = async (value)=>{
             />
             {autoComedor
                 ?
-                <MaterialCommunityIcons name="motion-sensor" size={34} color= {darkTheme ? "#8bbe1b":"#21421e"} style={{marginLeft:20}} />              :
+                <MaterialCommunityIcons name="motion-sensor" size={34} color= {darkTheme ? "#8bbe1b":"#21421e"} style={{marginLeft:20}} />
+                :
                 <MaterialCommunityIcons name="motion-sensor-off" size={34} color={darkTheme ? "white":"black"} style={{marginLeft:20}} />
                 }
           </View>
@@ -513,6 +515,17 @@ const handleControlDeLuz = async (value)=>{
         >
           {tap < 2 ?<FontAwesome name="angle-double-down" size={24} color={darkTheme ? "#ECF0F1" :"#424949"} style={{margin:1}}/>:null}
         </Animated.View>
+         <View style={{display:"flex",flexDirection:"row",alignItems:"center",justifyContent:"space-around", marginTop:tap < 2 ? 5:110}}>
+          <Text style={{ fontSize: 25,color:darkTheme ? "#ECF0F1" :"#424949"}}>Temperatura</Text>
+          <Text style={{ fontSize: 25,color:darkTheme ? "#ECF0F1" :"#424949"}}>Humedad</Text>
+         </View>
+        
+        <View style={[styles.title,{backgroundColor:!darkTheme ? "#2471A3" :"#D35400"},{marginHorizontal:10,borderRadius:10}]}>
+          <View style={[styles.bombilla,{marginTop:0}]}>
+            <Text style={{ fontSize: 35,color: "#ECF0F1" }}>22ºC</Text>
+            <Text style={{ fontSize: 35,color: "#ECF0F1" }}>40%</Text>
+          </View>
+        </View>
       </ScrollView>
       {/* </LinearGradient> */}
       </View>}
