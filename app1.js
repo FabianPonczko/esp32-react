@@ -36,7 +36,8 @@ function App1() {
   const [luzCocina, setLuzCocina] = useState(false);
   const [luzComedor1Encendida, setLuzComedor1Encendida] = useState(false);
   const [luzComedor2Encendida, setLuzComedor2Encendida] = useState(false);
-  
+  const [temp, setTemp] = useState(0);
+  const [humedad, setHumedad] = useState(0);
   
 
   const [controlDeLuz, setControlDeLuz] = useState("");
@@ -62,7 +63,7 @@ function App1() {
      !firstInicio && save()
      !firstInicio && Speech.speak("bienvenido al asistente de luces del hogar. Con el, podras configurar diferentes funciones, como activar el modo luces en automatico por cada luz en particular, tiempo de encendido, o accionarlas de forma manual, etc.")
     setTap(tap+1)
-    console.log("Tap:" , tap)
+     console.log("Tap:" , tap)
     
     //status cocina
     try {
@@ -84,9 +85,15 @@ function App1() {
             let positionInicial= resp.search("controldeluz")
             let positionFinal= resp.search("entrada")
             setControlDeLuz(resp.substring(positionFinal,positionInicial+12))
-                        
             let positionInicialValorAnalogico= resp.search("valoranalogico")
             setSensorDeLuz(resp.substring(positionInicialValorAnalogico+14,positionInicial))
+            
+            let tempInicio = resp.search("temp")
+            let tempFinal = resp.search("humedad")
+            setTemp(resp.substring(tempFinal,tempInicio+4))
+            let humedadInicio = resp.search("humedad")
+            let humedadFinal = resp.search("final")
+            setHumedad(resp.substring(humedadFinal,humedadInicio+7))
 
           } else {
             setAutoCocina(false);
@@ -515,15 +522,15 @@ const handleControlDeLuz = async (value)=>{
         >
           {tap < 2 ?<FontAwesome name="angle-double-down" size={24} color={darkTheme ? "#ECF0F1" :"#424949"} style={{margin:1}}/>:null}
         </Animated.View>
-         <View style={{display:"flex",flexDirection:"row",alignItems:"center",justifyContent:"space-around", marginTop:tap < 2 ? 5:110}}>
+         <View style={{display:"flex",flexDirection:"row",alignItems:"center",justifyContent:"space-around",marginBottom:10, marginTop:tap < 2 ? 5:110}}>
           <Text style={{ fontSize: 25,color:darkTheme ? "#ECF0F1" :"#424949"}}>Temperatura</Text>
           <Text style={{ fontSize: 25,color:darkTheme ? "#ECF0F1" :"#424949"}}>Humedad</Text>
          </View>
         
         <View style={[styles.title,{backgroundColor:!darkTheme ? "#2471A3" :"#D35400"},{marginHorizontal:10,borderRadius:10}]}>
-          <View style={[styles.bombilla,{marginTop:0}]}>
-            <Text style={{ fontSize: 35,color: "#ECF0F1" }}>22ºC</Text>
-            <Text style={{ fontSize: 35,color: "#ECF0F1" }}>40%</Text>
+          <View style={[styles.bombilla,{marginTop:-10,justifyContent:"space-around",height:50}]}>
+            <Text style={{ fontSize: 35,color: "#ECF0F1" }}>{parseInt(temp).toFixed(0)}ºC</Text>
+            <Text style={{ fontSize: 35,color: "#ECF0F1" }}>{parseInt(humedad).toFixed(0)}%</Text>
           </View>
         </View>
       </ScrollView>
