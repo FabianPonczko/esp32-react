@@ -18,8 +18,8 @@ import * as SecureStore from 'expo-secure-store';
 import Intro from "./intro";
 import { StatusBar as StatusBarExpo} from 'expo-status-bar';
 
-const cosinaIp = `http://192.168.100.147:1000`;
-const comedorIp = `http://192.168.100.200:1002`;
+const cosinaIp = "http://192.168.100.147:1000";
+const comedorIp = "http://192.168.100.200:1002";
 
 function App1() {
   const [inicioCocina, setInicioCocina] = useState(cosinaIp);
