@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "fetch_esp32",
+    "name": "Luces Automaticas",
     "slug": "fetch_esp32",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -18,7 +18,7 @@
       "supportsTablet": true
     },
     "android": {
-        "adaptiveIcon": {
+      "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
@@ -31,6 +31,9 @@
       "eas": {
         "projectId": "0e2b141d-e34e-4251-b1d3-df355b01e0d5"
       }
-    }
+    },
+    "plugins": [
+      "expo-secure-store"
+    ]
   }
 }

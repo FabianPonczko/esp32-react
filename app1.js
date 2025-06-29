@@ -17,7 +17,6 @@ import * as Speech from 'expo-speech';
 import * as SecureStore from 'expo-secure-store';
 import Intro from "./intro";
 import { StatusBar as StatusBarExpo} from 'expo-status-bar';
-import { LinearGradient } from 'expo-linear-gradient';
 
 const cosinaIp = "http://192.168.100.147:1000";
 const comedorIp = "http://192.168.100.200:1002";
