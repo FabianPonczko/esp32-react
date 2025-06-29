@@ -9,8 +9,9 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo/metro-runtime": "~5.0.4",
     "@expo/vector-icons": "^14.1.0",
-    "@react-native-community/checkbox": "^0.5.16",
+    "@react-native-checkbox/checkbox": "^0.5.8",
     "@rneui/themed": "^4.0.0-rc.8",
     "expo": "^53.0",
     "expo-checkbox": "~4.1.4",
@@ -19,10 +20,9 @@
     "expo-speech": "~13.1.7",
     "expo-status-bar": "~2.2.3",
     "react": "19.0.0",
-    "react-native": "0.79.4",
     "react-dom": "19.0.0",
-    "react-native-web": "^0.20.0",
-    "@expo/metro-runtime": "~5.0.4"
+    "react-native": "0.79.4",
+    "react-native-web": "^0.20.0"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0"

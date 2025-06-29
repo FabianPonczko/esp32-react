@@ -18,8 +18,8 @@ import * as SecureStore from 'expo-secure-store';
 import Intro from "./intro";
 import { StatusBar as StatusBarExpo} from 'expo-status-bar';
 
-const cosinaIp = "http://192.168.100.147:1000";
-const comedorIp = "http://192.168.100.200:1002";
+const cosinaIp = `http://192.168.100.147:1000`;
+const comedorIp = `http://192.168.100.200:1002`;
 
 function App1() {
   const [inicioCocina, setInicioCocina] = useState(cosinaIp);
@@ -62,7 +62,7 @@ function App1() {
      !firstInicio && save()
      !firstInicio && Speech.speak("bienvenido al asistente de luces del hogar. Con el, podras configurar diferentes funciones, como activar el modo luces en automatico por cada luz en particular, tiempo de encendido, o accionarlas de forma manual, etc.")
     setTap(tap+1)
-     console.log("Tap:" , tap)
+    //  console.log("Tap:" , tap)
     
     //status cocina
     try {
@@ -104,7 +104,9 @@ function App1() {
         })
         
     } catch (error) {
+      Alert.alert("Error al conectar", error.message);
       console.log(error);
+      
     }finally{setOnRefresh(false)}
    
     await fetch(`${cosinaIp}/Lucesinicio`)
