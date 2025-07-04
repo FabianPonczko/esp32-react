@@ -23,8 +23,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.fabianponczko.fetch_esp32",
-      "usesCleartextTraffic": true
+      "package": "com.fabianponczko.fetch_esp32"
     },
     "web": {
       "favicon": "./assets/favicon.png"
